@@ -158,7 +158,7 @@ vector<double> calculate_probs(vector< vector<double> >& population){
 
 
 
-vector< vector<double> > select_mating_pool(vector< vector<double> > population, int parents){
+vector< vector<double> > select_mating_pool(vector< vector<double> >& population, int parents, bool Elitism){
 	int i;
 	double prob;
 	std::random_device rd;
@@ -166,6 +166,15 @@ vector< vector<double> > select_mating_pool(vector< vector<double> > population,
     std::uniform_real_distribution<double> distribution(0,1);
 	
 	vector< vector<double> > arr;
+
+	if(Elitism){
+		cout<<"Elitism:ON"<<endl;
+		arr.insert(arr.end(), population[0]);
+		population.erase(population.begin());
+	}
+	else{
+		cout<<"Elitism:OFF"<<endl;
+	}
 	
 	
 	while(arr.size() < parents){
