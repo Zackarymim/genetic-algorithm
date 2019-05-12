@@ -6,9 +6,9 @@ int main(){
     /*PARAMETRE DE L'ALGORITHME*/
 
     /*BEGIN*/
-    vector<double> params{ 10, 50, 10, 50};
+    vector<double> params{ 1, 1, 1, 50};
 
-    int nbr_individus = 20;
+    int nbr_individus = 10;
 
     double mutation = 0.4;
 
@@ -22,7 +22,7 @@ int main(){
 
     for(i=0;i<Generations;i++){
 
-        calculate_fitness(population,params);
+        calculate_fitness(population,params,(i+1));
 
         calculate_probs(population);
 
@@ -30,12 +30,12 @@ int main(){
 
         print(population);
 
+        best_fitness(population);
 
 
+        population = select_mating_pool(population,nbr_individus/2,false);
 
-        population = select_mating_pool(population,nbr_individus/2,true);
-
-        calculate_fitness(population,params);
+        calculate_fitness(population,params,(i+1));
 
         calculate_probs(population);
 
@@ -46,9 +46,9 @@ int main(){
 
 
 
-        children = weighted_avg_crossover(population,nbr_individus/2);
+        children = one_point_crossover(population,nbr_individus/2);
 
-        calculate_fitness(children,params);
+        calculate_fitness(children,params,(i+1));
 
         calculate_probs(children);
 
@@ -62,7 +62,7 @@ int main(){
 
         Random_Reset_Mutation(children,mutation);
 
-        calculate_fitness(children,params);
+        calculate_fitness(children,params,(i+1));
 
         calculate_probs(children);
 

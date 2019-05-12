@@ -16,8 +16,49 @@ int Genes = 3;
 int MIN = 0, MAX=15;
 
 /*END*/
-double randomf(){
-	return (double)rand()/(double)RAND_MAX;
+
+int calculate_obj(vector<double> v){
+	int i;
+	int res = 1;
+	for(i=0;i<v.size()-3;i++){
+		res *= v[i];
+	}
+	return res;
+}
+
+void best_fitness(vector< vector<double> > arr){
+	vector<double> sol = arr[0];
+
+	TextTable t( '-', '|', '+' );
+
+	t.add( "x" );t.add( "y" );t.add( "z" );t.add( "x*y*z" );t.add( "x+y+z=36" );t.add( "x<=y" );t.add( "z<10" );
+	t.endOfRow();
+
+	double prod = arr[0][0] * arr[0][1] * arr[0][2];
+
+	t.add( to_string(arr[0][0]) );t.add( to_string(arr[0][1]) );t.add( to_string(arr[0][2]) );t.add( to_string(prod) );
+
+	if(arr[0][0] + arr[0][1] + arr[0][2] == 36)	
+		t.add( "Respected!" );
+	else
+		t.add( "Not Respected!" );
+	
+	if(arr[0][0] <= arr[0][1])	
+		t.add( "Respected!" );
+	else
+		t.add( "Not Respected!" );
+	
+	if(arr[0][2] < 10)	
+		t.add( "Respected!" );
+	else
+		t.add( "Not Respected!" );
+
+	t.endOfRow();
+
+	std::cout << t <<endl;
+
+
+
 }
 
 bool diff( const vector<double>& v1, const vector<double>& v2 ) { 
@@ -89,23 +130,26 @@ vector< vector<double> > create_population(int indv,int genes){
 	return arr;
 }
 
-vector<double> calculate_fitness(vector< vector<double> >& population, vector<double> params){
+vector<double> calculate_fitness(vector< vector<double> >& population, vector<double> params, int Generation){
 
     if (population[0].size() != 6){
         cout<<"Le changement de nombre des genes entraine la redefinition de la fonction de fitness";
         exit(0);
     }
-	int i,j,k,temp1,temp3,temp4;
-    double temp2,f;
+	int i,j,k;
+    double constraint1,constraint3,constraint4,constraint2,f;
 
 	vector<double> fitness(population.size());
 
 	for(i=0 ; i<population.size() ; i++){
-		temp1 = population[i][0] * population[i][1] * population[i][2];
-        temp2 = double(1) / double((fabs(population[i][0] + population[i][1] + population[i][2] - 36))) && 1.0;
-        temp3 = population[i][1] - population[i][0];
-        temp4 = 10 - population[i][2];
-		f = params[0] * temp1 + params[1] * temp2 + params[2] * temp3 + params[3] * temp4;
+
+		constraint1 = population[i][0] * population[i][1] * population[i][2];
+        constraint2 = -fabs((population[i][0] + population[i][1] + population[i][2]) - 36);
+        constraint3 = population[i][1] - population[i][0];
+        constraint4 = 10 - population[i][2] > 0? 1:0;
+
+
+		f = params[0] * constraint1 + params[1] * Generation * constraint2 + params[2] * Generation * constraint3 + params[3] * Generation * constraint4;
 
 		if (f >= 0)
         	fitness[i] = f;
@@ -137,11 +181,6 @@ vector<double> calculate_probs(vector< vector<double> >& population){
 
 	for(i=0 ; i<population.size() ; i++){
 		total_fitness += population[i][population[0].size()-3];
-	}
-
-	if(total_fitness == 0){
-		cout<<"A Zero was Generated, Please try again"<<endl;
-		exit(EXIT_FAILURE);
 	}
 	
 	for(i=0 ; i<population.size() ; i++){
@@ -285,10 +324,12 @@ void Random_Reset_Mutation(vector< vector<double> >& children, double mutation){
 vector< vector<double> > weighted_avg_crossover(vector< vector<double> > population, int children){
 	int i,j;
 	int parent1,parent2;
+
+	double proba;
 	
-	/*std::random_device rd;
+	std::random_device rd;
     std::default_random_engine generator(rd());
-    std::uniform_int_distribution<int> distribution(0,Genes-1);*/
+    std::uniform_real_distribution<double> distribution(0,1);
 	
 	vector< vector<double> > arr;
 	vector<double> temp;
@@ -296,11 +337,13 @@ vector< vector<double> > weighted_avg_crossover(vector< vector<double> > populat
 	i=0;
 	while(arr.size() < children){
 
+		proba = distribution(generator);
+
 		parent1 = i%(population.size());
 		parent2 = (i+1)%(population.size());
 
 		for(j=0;j<Genes;j++){
-			temp.insert(temp.end(),floor((population[parent1][j] + population[parent2][j])/2));
+			temp.insert(temp.end(),floor((proba * population[parent1][j] + (1 - proba) * population[parent2][j])));
 		}
 
 		temp.insert(temp.end(),0);
