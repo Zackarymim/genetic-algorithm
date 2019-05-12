@@ -66,7 +66,6 @@ void printd(vector<double> arr){
 
 vector< vector<double> > create_population(int indv,int genes){
 	int i,j,k;
-
 	
 
 	std::random_device rd;
@@ -103,7 +102,7 @@ vector<double> calculate_fitness(vector< vector<double> >& population, vector<do
 
 	for(i=0 ; i<population.size() ; i++){
 		temp1 = population[i][0] * population[i][1] * population[i][2];
-        temp2 = double(1) / double((fabs(population[i][0] + population[i][1] + population[i][2] - 36)));
+        temp2 = double(1) / double((fabs(population[i][0] + population[i][1] + population[i][2] - 36))) && 1.0;
         temp3 = population[i][1] - population[i][0];
         temp4 = 10 - population[i][2];
 		f = params[0] * temp1 + params[1] * temp2 + params[2] * temp3 + params[3] * temp4;
@@ -131,13 +130,18 @@ vector<double> calculate_probs(vector< vector<double> >& population){
 		population[j][population[0].size()-2] = 0;
 	}
 
-	double total_fitness = 0,check=0;
+	double total_fitness = 0;
 
 	vector<double> probs(population.size());
 
 
 	for(i=0 ; i<population.size() ; i++){
 		total_fitness += population[i][population[0].size()-3];
+	}
+
+	if(total_fitness == 0){
+		cout<<"A Zero was Generated, Please try again"<<endl;
+		exit(EXIT_FAILURE);
 	}
 	
 	for(i=0 ; i<population.size() ; i++){
@@ -189,13 +193,11 @@ vector< vector<double> > select_mating_pool(vector< vector<double> >& population
 		}
 		
 	}
-
-	calculate_probs(arr);
 	
 	return arr;
 }
 
-vector< vector<double> > crossover(vector< vector<double> > population, int children){
+vector< vector<double> > one_point_crossover(vector< vector<double> > population, int children){
 	int i,j,crossover_point;
 	int parent1,parent2;
 	
@@ -278,3 +280,42 @@ void Random_Reset_Mutation(vector< vector<double> >& children, double mutation){
 	}
 
 }
+
+
+vector< vector<double> > weighted_avg_crossover(vector< vector<double> > population, int children){
+	int i,j;
+	int parent1,parent2;
+	
+	/*std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<int> distribution(0,Genes-1);*/
+	
+	vector< vector<double> > arr;
+	vector<double> temp;
+
+	i=0;
+	while(arr.size() < children){
+
+		parent1 = i%(population.size());
+		parent2 = (i+1)%(population.size());
+
+		for(j=0;j<Genes;j++){
+			temp.insert(temp.end(),floor((population[parent1][j] + population[parent2][j])/2));
+		}
+
+		temp.insert(temp.end(),0);
+		temp.insert(temp.end(),0);
+		temp.insert(temp.end(),0);
+
+		arr.insert(arr.end(),temp);
+
+		temp.clear();
+
+		i++;
+		
+		
+	}
+	
+	return arr;
+}
+
