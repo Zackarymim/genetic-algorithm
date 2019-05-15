@@ -6,7 +6,7 @@ int main(){
     /*PARAMETRE DE L'ALGORITHME*/
 
     /*BEGIN*/
-    vector<double> params{ 1, 1, 1, 50};
+    vector<double> params{ 1, 20, 50, 50};
 
     int nbr_individus = 10;
 
@@ -46,7 +46,7 @@ int main(){
 
 
 
-        children = one_point_crossover(population,nbr_individus/2);
+        children = weighted_avg_crossover(population,nbr_individus/2);
 
         calculate_fitness(children,params,(i+1));
 

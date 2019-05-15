@@ -66,7 +66,6 @@ bool diff( const vector<double>& v1, const vector<double>& v2 ) {
 } 
 
 void print(vector< vector<double> > arr){
-    cout<<endl;
 
 	TextTable t( '-', '|', '+' );
 
@@ -145,17 +144,21 @@ vector<double> calculate_fitness(vector< vector<double> >& population, vector<do
 
 		constraint1 = population[i][0] * population[i][1] * population[i][2];
         constraint2 = -fabs((population[i][0] + population[i][1] + population[i][2]) - 36);
-        constraint3 = population[i][1] - population[i][0];
+        constraint3 = population[i][1] >= population[i][0]? 1:0;
         constraint4 = 10 - population[i][2] > 0? 1:0;
 
 
 		f = params[0] * constraint1 + params[1] * Generation * constraint2 + params[2] * Generation * constraint3 + params[3] * Generation * constraint4;
+		
+
+
 
 		if (f >= 0)
         	fitness[i] = f;
-		else
+		else{
 			fitness[i] = 0;
-		
+			cout<<"zero in"<<(i+1)<<endl;
+		}
         population[i][population[0].size()-3] = fitness[i];
 	}
 
